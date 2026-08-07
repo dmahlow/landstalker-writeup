@@ -22,6 +22,12 @@ Over four days at the start of August I built a remaster of it.
 <figcaption>Walking around, running at 60Hz off the emulator's RAM.</figcaption>
 </figure>
 
+For as long as I had thought about it at all, I assumed fixing the jumping meant fixing the game. Patch the 68000 collision routines in the disassembly, or pull the whole thing apart, rebuild the engine, and write a controller that felt right. Both are real projects. Both are expensive, and I priced them properly one evening before writing a line of code, along with a full remake, which is worse.
+
+Then I noticed I had been solving the wrong problem. I do not want better physics. I want to see where I am going to land. Those are not the same requirement, and only one of them is cheap.
+
+The cheap one is to leave the game exactly as it is and change only what you see. Which had already been ruled out earlier that same evening, on the perfectly sound grounds that if the emulator is the physics then it can never fix the jumping. It stopped being a problem the moment I stopped trying to fix the jumping.
+
 Nothing in it is reimplemented. The original ROM runs unmodified in Genesis Plus GX at 60Hz, and combat, dialogue, physics, item handling, puzzle state and room transitions still happen in the 68000 code. What I replaced is the presentation layer: a bridge reads the emulator's work RAM every frame and streams the game state over a websocket, and a three.js renderer draws that state as real geometry, using tile and sprite art extracted from the ROM. The emulator's own video output gets thrown away. It is in there as a physics and logic server. Audio passes straight through, because there was no reason to touch it.
 
 There is one rule that kept the whole thing tractable: never write to emulator RAM. Input goes in through the pad, the same three buttons and d-pad the hardware has, and state only comes out. I was strict about this for two reasons:
@@ -31,7 +37,7 @@ There is one rule that kept the whole thing tractable: never write to emulator R
 
 So even the click-to-move pathfinding plays by pad: it plans a route over the extracted collision grid and then presses direction buttons cell by cell, like a very patient person with a controller.
 
-Once the world is actual geometry instead of a painted picture, a lot of things that were impossible on the hardware come nearly for free. Point lights from the torches that cast real shadows. Ambient occlusion. Arbitrary zoom. A browser as the display with a phone as the controller. And a soft shadow under the player that shrinks as he rises. I did not fix the jumping (the physics lives in the ROM and stays there), but you can now see where you will land, which after thirty-four years is what I wanted in the first place.
+Once the world is actual geometry instead of a painted picture, a lot of things that were impossible on the hardware come nearly for free. Point lights from the torches that cast real shadows. Ambient occlusion. Arbitrary zoom. A browser as the display with a phone as the controller. And a soft shadow under the player that shrinks as he rises. I did not fix the jumping (the physics lives in the ROM and stays there), but you can now see where you will land, which is all I ever actually wanted.
 
 About the ROM: "ship code, never content" is the line in the project spec. The ROM is not in the repo and is not distributed; it is a read-only input supplied by whoever runs this, pinned by SHA-1, with a hard fail on any mismatch.
 
@@ -39,7 +45,7 @@ One more thing before the technical part, so nobody has to wonder: this was buil
 
 ## The emulator as a physics server
 
-The bridge is a Python process holding the Genesis Plus GX libretro core through ctypes. It runs a frame, reads memory, sends messages, then sleeps until the next 60Hz tick. The whole protocol fits in a docstring:
+To draw the game myself I needed to know, sixty times a second, where everything in it was. The bridge is a Python process holding the Genesis Plus GX libretro core through ctypes. It runs a frame, reads memory, sends messages, then sleeps until the next 60Hz tick. The whole protocol fits in a docstring:
 
 ```
 server -> client: {"t": "hello", "audio_rate": 44100}   once on connect
@@ -119,7 +125,7 @@ The animated tileset table shows where this approach runs out. It has a length f
 
 ## Drawing it
 
-With the room data checked, the projection comes straight out of the disassembly, from a routine that converts world coordinates to screen coordinates every frame:
+Now I had the shape of the world and no idea where to put it on screen. The game's own answer is in the disassembly, in a routine that converts world coordinates to screen coordinates every frame:
 
 ```
 dx = CentreX - Z - camX
@@ -277,7 +283,7 @@ The flattering way to read that distribution is that I set the constraints and t
 
 The constraints came from the spec, which I had written in a separate conversation before opening an editor, and it is the load-bearing document of the whole project. It names the model (the original stays authoritative, replace only presentation) and it lists non-goals in imperative form, each with a one-line reason. Do not reimplement game logic. Do not fix the jumping. Do not build a free camera. Do not modify or redistribute the ROM. Above them sits a sentence I never had to repeat: "Each one converts a bounded project into an unbounded one."
 
-Those non-goals were not decreed. They are what was left after an hour of pricing the alternatives. The conversation ran through four of them: patch the 68000 jump and collision routines in the disassembly, extract everything into a new engine and reimplement the controller, do a full remake, or leave the ROM running and replace only what it draws. The last one, which is what got built, had been explicitly ruled out earlier in that same conversation, on the grounds that if the emulator is the physics then it can never fix the jumping. It became available again only when I gave up on fixing the jumping, at which point the thing that had disqualified it was the thing that made it cheap. That is my best explanation for why the non-goals held across 62 messages without me ever defending them. They had already been argued.
+Those non-goals were not decreed. They are what was left after the hour of pricing alternatives I described at the start: four options, three of them expensive, and the cheap one only becoming available once I stopped trying to fix the physics. Each prohibition in that list is a corpse. That is my best explanation for why they held across 62 messages without me ever once defending them. They had already been argued.
 
 Several decisions came close to the line (click-to-move pathfinding and the step-up jump assist both sit right on the boundary between presentation and gameplay), and the agent held the line itself, in the spec's own vocabulary, and wrote the reasoning into the commit messages. Two of my three session-opening prompts were handover documents that the previous session's agent had written for me, which I pasted without editing. The single most technically detailed "human" message in the entire corpus is one of those, and I did not write a word of it. On day four I described my own project back to the agent to check that I understood it, and got three corrections and two omissions in return.
 
