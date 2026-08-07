@@ -144,7 +144,11 @@ The original draws 320x224 because that is what the hardware had. The 3D view ha
 
 ## The sprite problem
 
-The spec warned me about this before a line of it existed: priority bits and sort order will fight you, budget real time, this is the main source of visual wrongness. It was right, and it still took three attempts. I will go through all three, because the sequence is the story of me slowly noticing I had the wrong mental model.
+The spec warned me about this before a line of it existed: priority bits and sort order will fight you, budget real time, this is the main source of visual wrongness. It was right, and it still took three attempts.
+
+> one more thing, there is some odd clipping [...] seems to happen when nigel is against a non-room wall?
+
+That is the bug report, in full, from me on a couch on day one. It is also the only description of the problem anybody had for a while.
 
 Sprites are billboards, flat quads standing in the world. The first version put each quad at its entity's depth, and walls behind the character clipped his head off, because a wall face one cell further back has greater depth than the character's feet. Obvious enough in hindsight.
 
@@ -281,8 +285,6 @@ What I actually contributed came almost entirely from having the game open in fr
 
 > btw the sprites seem to be upside down, the stats and Nigel are, in our version
 
-> one more thing, there is some odd clipping [...] seems to happen when nigel is against a non-room wall?
-
 > hmm, the original vanillaware looked better, more detailed. this one looks like a flash game, sort of. any ideas why, and how we can get it more like the initial version I fell in love with?
 
 > ok cool. btw. I noticed a small bug in the interior, the church looks broken, at least with the previous HD backdrop, something to check maybe
@@ -310,6 +312,22 @@ The cheap feedback also changed which work was worth doing at all. Working alone
 Which changes the honest counterfactual. Without agents this is not a four-day project; it is most of a year of evenings for someone who already knows 68000 assembly, VDP internals and three.js. More likely, it is not a project at all. Things like this die at a specific place: month two, the decoder is 95% right, one room renders garbage, there is no oracle because building the oracle felt like a detour, and the debugging plateau runs for weeks with nothing to show for it. The test suite is what makes that plateau survivable.
 
 What is left: a WebAssembly build, which moves the core into the browser and makes the whole thing a static page instead of a server per player. And every remaining NPC sprite sheet, which I will probably not do.
+
+So are more of these coming? I think so, and for a reason that is not the obvious one.
+
+What made this cheap was not the agent. It was that somebody had already spent years reverse engineering Landstalker: a disassembly that reassembles byte-identical, a C++ format library, an editor, two randomizers. That is a great deal of careful unpaid work, and the whole project stands on it. Which seems to say this only works for games that already have all that, and not many do.
+
+I do not think that is right, and the reason is sitting in the harness. It never checked my decoders against the disassembly. It checked them against the running game's own framebuffer and reported a percentage. That loop needs no prior art at all: decode a room, draw it, diff it against what the emulator puts on screen, read the number. The prior art made this faster. It was never what made it possible. The oracle ships with the game, and libretro cores exist for most of the hardware anyone is nostalgic about.
+
+Two things temper it. Landstalker stores a real heightmap, per-cell height and collision flags, because it was doing 3D on a 68000 in 1992. That is the only reason there is any geometry here to light or cast shadows from. A flat 2D game hands you a painted plane and nothing to project, and what you would be doing is upscaling, which is a duller project.
+
+The other is the half of this article you have just read. The part that would supposedly scale to twenty games is the art, and the art is the part with no oracle, that needed me for every judgment, that produced five semantic failures nothing automated caught, and that is still not settled. A remaster is mostly taste, and taste stayed at human speed.
+
+So, hedged exactly as far as I believe it: more of these are coming, and they will be made one person at a time, for one game that person loved, over a handful of evenings. Not by anybody doing twenty.
+
+There is a group for whom this is economics rather than affection, and it is not us. None of it is distributable. Sega could ship this tomorrow; I can only build it for myself. Which, going back through the ideation conversation, is the only thing I ever asked for:
+
+> I just want this for myself
 
 The last thing I typed at this project, at six in the morning after too many parallel sessions, was "small change, make her house a rainbow themed house". Ten minutes later: "damn, wrong session, pls revert". By then the agent had already regenerated the house.
 
