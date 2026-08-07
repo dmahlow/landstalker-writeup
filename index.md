@@ -49,6 +49,11 @@ client -> server: {"t": "input", "buttons": ["up", "c"]}
 Binary frames are reserved for audio.
 ```
 
+<figure class="wide">
+<img src="media/architecture-diagram.png" alt="Architecture: ROM and emulator on the left, bridge in the middle, three.js renderer on the right" loading="lazy">
+<figcaption>The shape of it. Input goes in through the pad and state comes out through the memory reader, and nothing ever goes the other way. The emulator's own video output is used only for the HUD and the dialogue boxes; everything you play is drawn from the state message.</figcaption>
+</figure>
+
 The state message is the important one. Every tick it does one bulk read of the entity table at `0xFF5400`, sixteen slots of `0x80` bytes each, slot 0 being the player. The table walk uses two sentinels the game itself uses: a first byte of `0x7F` marks an empty slot, and anything `>= 0x80` ends the table. Per entity it pulls position, height, facing, hflip, palette line, graphics id, animation and frame, type and hp. Alongside that go the camera words at `0xFF1200` and `0xFF1202`, the room id, the live colour RAM, and the VDP window-plane registers together with their RAM shadows. That is everything the renderer knows about the game.
 
 The video message arrives at 15fps and exists only so the browser can composite the HUD, dialogue boxes and menus. Those are drawn by the VDP's window plane and would be tedious to reproduce, so I did not reproduce them. Everything you actually play is rendered from the state message.
