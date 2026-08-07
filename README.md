@@ -8,7 +8,6 @@ extracted out of the cartridge.
 Read it at **https://dmahlow.github.io/landstalker-writeup/**
 
 - `index.md` - the article
-- `spec.md` - the spec the project was built from, unedited
 - `media/` - screenshots, comparisons and clips
 
 No ROM, no extracted game assets, and no code in this repo. Ship code, never content.

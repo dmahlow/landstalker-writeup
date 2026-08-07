@@ -85,6 +85,8 @@ Sprites are a four-level pointer chase (a base pointer, an animation table of 40
 
 I did not work any of this out from raw bytes, and I want to be clear about that. Landstalker has been reverse engineered for years by people who were very good at it. There is a full disassembly that reassembles byte-identical, a C++ format library, an editor, and two randomizers. One randomizer reads live RAM from a running US ROM, so it corroborates memory addresses rather than cartridge ones. All five got vendored into a `refs/` directory and treated as the specification.
 
+What none of them had done was connect any of that to a renderer. The data side of Landstalker has been solved for years by people doing careful, unglamorous work. The drawing side had not been attempted.
+
 The project spec I started from deliberately contained zero addresses. It had a note attached: any offsets it supplied from memory would be unreliable, so derive every one from those sources or from live investigation, and write each into `docs/offsets.md` with a note on how it was confirmed. That file has a provenance column. Entries never confirmed against a live emulator are still marked unverified. One of the format docs says outright that two flag bits are disputed between two reference implementations and that I do not know which is right. I prefer to write down what I don't know than to pretend the table is finished.
 
 ## How you know it's right
@@ -181,6 +183,8 @@ Cast shadows work off the heightmap. At room load, every visible face gets sampl
 
 And the blob shadows, which are the reason I started all of this. Ground height comes from the extracted heightmap, and the shadow is a world-space circle laid on the floor, which the projection turns into a correctly proportioned ellipse without any extra work. It shrinks and fades as the character rises. That is the whole feature. The jump arcs are identical to 1992, but you can see where you will land now.
 
+I spent that entire ideation conversation trying to work out how to fix the physics, and fixing the physics was never what I wanted. I wanted to see where I was going to land. Those are not the same requirement, and the cheap architecture only became available once I had said the second one out loud.
+
 <figure class="wide">
 <video controls muted loop playsinline preload="metadata" src="media/demo-pathfinding-zoom.mp4"></video>
 <figcaption>Click-to-move pathfinding and free zoom. Every move is still pad input into the emulator.</figcaption>
@@ -191,6 +195,8 @@ Every one of these features defaults to off, and with the neutral settings the s
 ## The other half: the art, and the gate that could not see
 
 The generated art had no oracle, and could not have one, and this section is about what that turned out to mean in practice.
+
+One admission first. The ideation conversation never discussed generating art at all. The only trace of it is a passing exchange about giving NPCs more variety, where the answer pointed out that outside the ROM there are no VRAM or palette limits, and that the hard part would be stylistic consistency: new art has to match the original's conventions or it reads as foreign against the extracted world. That is the whole second half of this project, described in one sentence, on day zero, by someone who had not seen any of it. I filed it under later.
 
 The pipeline rasterises a room canvas from the extracted assets, pads it with black to the nearest aspect ratio the image API supports, and sends it image-to-image to Gemini at 4K with a prompt insisting the layout is authoritative. It resizes the result back to exactly 4x, crops the padding, and forces the void area black again. Room variants share art, so deduplicating by rendered identity turns 816 rooms into 647 unique canvases. The renderer then swaps the palette-index albedo for the generated image and keeps every other feature: lighting, shadows, ambient occlusion, the priority overlay, and the colour-RAM fade tracking, so HD rooms still fade correctly through doors.
 
@@ -264,6 +270,8 @@ The flattering way to read that distribution is that I set the constraints and t
 
 The constraints came from the spec, which I had written in a separate conversation before opening an editor, and it is the load-bearing document of the whole project. It names the model (the original stays authoritative, replace only presentation) and it lists non-goals in imperative form, each with a one-line reason. Do not reimplement game logic. Do not fix the jumping. Do not build a free camera. Do not modify or redistribute the ROM. Above them sits a sentence I never had to repeat: "Each one converts a bounded project into an unbounded one."
 
+Those non-goals were not decreed. They are what was left after an hour of pricing the alternatives. The conversation ran through four of them: patch the 68000 jump and collision routines in the disassembly, extract everything into a new engine and reimplement the controller, do a full remake, or leave the ROM running and replace only what it draws. The last one, which is what got built, had been explicitly ruled out earlier in that same conversation, on the grounds that if the emulator is the physics then it can never fix the jumping. It became available again only when I gave up on fixing the jumping, at which point the thing that had disqualified it was the thing that made it cheap. That is my best explanation for why the non-goals held across 62 messages without me ever defending them. They had already been argued.
+
 In 62 messages, I never once had to defend those non-goals during the build. Several decisions came close to the line (click-to-move pathfinding and the step-up jump assist both sit right on the boundary between presentation and gameplay), and the agent held the line itself, in the spec's own vocabulary, and wrote the reasoning into the commit messages. Two of my three session-opening prompts were handover documents that the previous session's agent had written for me, which I pasted without editing. The single most technically detailed "human" message in the entire corpus is one of those, and I did not write a word of it. On day four I described my own project back to the agent to check that I understood it, and got three corrections and two omissions in return.
 
 What I actually contributed came almost entirely from having the game open in front of me:
@@ -285,6 +293,8 @@ That last one, typed in passing, is the church from the previous section, and it
 
 The mobile controls are the sharpest single illustration of the pattern. A subagent built a touch layer and verified it exhaustively, with real Chrome touch events dispatched through the debugging protocol, proving that tap and drag and flick and pinch all produced the right pad output, 850 tests green, screenshots attached. Every gesture worked. I put it on my phone, played for twenty minutes, and reported: "right now I don't even know how to swing the sword". It had shipped a gesture-only scheme with no visible buttons. The verification was complete and correct and the thing was unusable, because nothing it could check would have told it that.
 
+The irritating part is that the right shape had already been specified. The same ideation conversation had described it before any code existed: a screen-relative stick that appears under the thumb, snapping to the world axes, with visible buttons kept out of the play area. That is roughly what the touch layer became on the second attempt. The prediction was there. What nobody predicted was that an agent would ship 850 passing tests around the wrong shape first.
+
 <figure class="wide">
 <img src="media/phone-touch-layer.png" alt="The replacement: a floating stick under the left thumb and actual visible buttons under the right." loading="lazy">
 <figcaption>The replacement: a floating stick under the left thumb and actual visible buttons under the right.</figcaption>
@@ -302,4 +312,4 @@ The last thing I typed at this project, at six in the morning after too many par
 
 ---
 
-The code is not public yet. When it is, it goes up without the ROM and without the extracted assets, which is the only way it can go up. The spec I started from is [here](spec.html), unedited.
+The code is not public yet. When it is, it goes up without the ROM and without the extracted assets, which is the only way it can go up.
