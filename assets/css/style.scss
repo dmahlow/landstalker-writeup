@@ -124,3 +124,23 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 3rem 0; }
     --code-bg: #201d16;
   }
 }
+
+/* review mode (?review=1) */
+span.rv { cursor: pointer; }
+span.rv-on {
+  background: rgba(255, 200, 0, 0.38);
+  box-shadow: 0 0 0 2px rgba(255, 200, 0, 0.38);
+  border-radius: 2px;
+}
+.rv-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  display: flex; gap: .75rem; align-items: center; justify-content: center;
+  padding: .7rem calc(.7rem + env(safe-area-inset-right)) calc(.7rem + env(safe-area-inset-bottom)) calc(.7rem + env(safe-area-inset-left));
+  background: var(--code-bg); border-top: 1px solid var(--rule);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem;
+}
+.rv-bar button {
+  font: inherit; padding: .45rem .9rem; border-radius: 4px;
+  border: 1px solid var(--rule); background: var(--bg); color: var(--fg); cursor: pointer;
+}
+.rv-count { color: var(--muted); min-width: 7em; }
