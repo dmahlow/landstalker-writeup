@@ -1,0 +1,7 @@
+title: The ROM is still the game
+description: Rendering Landstalker (Mega Drive, 1992) in three.js, with the original ROM still running as the simulation.
+theme: jekyll-theme-primer
+plugins:
+  - jekyll-seo-tag
+exclude:
+  - README.md
