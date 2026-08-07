@@ -15,7 +15,7 @@ Over four days at the start of August I built a remaster of it.
 <figure class="wide">
 <img src="media/gumi-hd.png" alt="Gumi village. Geometry, lighting and shadows are the renderer; the world, the physics and everything you can interact with are the 1992 ROM." loading="lazy">
 <figcaption>Gumi village. Geometry, lighting and shadows are the renderer; the world, the physics and everything you can interact with are the 1992 ROM.</figcaption>
-</figure>*Gumi village. Geometry, lighting and shadows are the renderer; the world, the physics and everything you can interact with are the 1992 ROM.*
+</figure>
 
 <figure class="wide">
 <video controls muted loop playsinline preload="metadata" src="media/demo-hd-walkthrough.mp4"></video>
@@ -113,7 +113,7 @@ The best bug the harness caught was in the harness itself, and I want to tell th
 <figure>
 <img src="media/extraction-vs-emulator.png" alt="The pixel harness. Top is the emulator's own framebuffer, bottom is the room rendered from extracted assets. The magenta band is the region under test." loading="lazy">
 <figcaption>The pixel harness. Top is the emulator's own framebuffer, bottom is the room rendered from extracted assets. The magenta band is the region under test.</figcaption>
-</figure>*The pixel harness. Top is the emulator's own framebuffer, bottom is the room rendered from extracted assets. The magenta band is the region under test.*
+</figure>
 
 The animated tileset table shows where this approach runs out. It has a length field, and I read it as bytes. It is VDP words, so every animation frame was half the size it should be. No oracle covered that table, so nothing failed, and the bug sat there until reading the game's own DMA routine and watching live VRAM exposed it. Wherever ground truth runs out, this is what the work goes back to looking like.
 
@@ -159,7 +159,7 @@ That removed the clipping, and it removed it categorically: room geometry can no
 <figure class="wide">
 <img src="media/sprite-priority-massan.png" alt="Massan, the room where the clipping was worst. Roof and step faces used to shave pixels off the character; now only the game's own priority bit can put art in front of him." loading="lazy">
 <figcaption>Massan, the room where the clipping was worst. Roof and step faces used to shave pixels off the character; now only the game's own priority bit can put art in front of him.</figcaption>
-</figure>*Massan, the room where the clipping was worst. Roof and step faces used to shave pixels off the character; now only the game's own priority bit can put art in front of him.*
+</figure>
 
 Every visual change in this project has to keep an exact-mode render pixel-identical to the Python renderer, and this rework did.
 
@@ -172,19 +172,19 @@ My favourite three lines in the codebase handle flames painted on walls. A flame
 <figure>
 <img src="media/torches-early.png" alt="First attempt at torch lights." loading="lazy">
 <figcaption>First attempt at torch lights.</figcaption>
-</figure>*First attempt at torch lights.*
+</figure>
 
 <figure>
 <img src="media/torches-final.png" alt="After clustering, flicker and emissive bloom. Nothing here is hand-placed; the room was scanned for warm animated tiles." loading="lazy">
 <figcaption>After clustering, flicker and emissive bloom. Nothing here is hand-placed; the room was scanned for warm animated tiles.</figcaption>
-</figure>*After clustering, flicker and emissive bloom. Nothing here is hand-placed; the room was scanned for warm animated tiles.*
+</figure>
 
 Cast shadows work off the heightmap. At room load, every visible face gets sample points marched toward the sun over the heightmap grid; a blocked ray means that sample is in shadow. The results rasterise into a half-resolution screen-space mask, resolving overlaps with the same `x + y + z` depth rule, get one box blur for a soft edge, and are sampled in the fragment shader. This takes 15 to 17 milliseconds per room and is cached, so it happens inside the game's own fade-to-black on room entry and nobody ever sees it happen.
 
 <figure class="wide">
 <img src="media/sun-shadows-massan.png" alt="Directional sun with baked shadows off the heightmap." loading="lazy">
 <figcaption>Directional sun with baked shadows off the heightmap.</figcaption>
-</figure>*Directional sun with baked shadows off the heightmap.*
+</figure>
 
 And the blob shadows, which are the reason I started all of this. Ground height comes from the extracted heightmap, and the shadow is a world-space circle laid on the floor, which the projection turns into a correctly proportioned ellipse without any extra work. It shrinks and fades as the character rises. That is the whole feature. The jump arcs are identical to 1992, but you can see where you will land now.
 
@@ -210,17 +210,17 @@ It works, and to my eye the result looks better than I expected. I went through 
 <figure class="wide">
 <img src="media/styles-contact-sheet.jpg" alt="Six candidate styles, same room, same geometry. Vanillaware (bottom left) won." loading="lazy">
 <figcaption>Six candidate styles, same room, same geometry. Vanillaware (bottom left) won.</figcaption>
-</figure>*Six candidate styles, same room, same geometry. Vanillaware (bottom left) won.*
+</figure>
 
 <figure class="wide">
 <img src="media/hd-toggle-pair.png" alt="The L key, mid-session. Same frame, same geometry, different albedo." loading="lazy">
 <figcaption>The L key, mid-session. Same frame, same geometry, different albedo.</figcaption>
-</figure>*The L key, mid-session. Same frame, same geometry, different albedo.*
+</figure>
 
 <figure class="wide">
 <img src="media/raytraced-style-test.jpg" alt="raytraced style test" loading="lazy">
 <figcaption>The register I did not take. Photoreal renders of the same rooms look genuinely good and belong to a different game.</figcaption>
-</figure>*The register I did not take. Photoreal renders of the same rooms look genuinely good and belong to a different game.*
+</figure>
 
 <figure class="wide">
 <video controls muted loop playsinline preload="metadata" src="media/demo-realistic-style.mp4"></video>
@@ -232,13 +232,13 @@ Quality control started with alignment, which is at least measurable. Take the g
 <figure class="wide">
 <img src="media/route434-before-after.png" alt="route canvas before and after" loading="lazy">
 <figcaption>What a good one looks like. Source render on top, generation below, same silhouette and the same walkable path.</figcaption>
-</figure>*What a good one looks like. Source render on top, generation below, same silhouette and the same walkable path.*
+</figure>
 
 Then I walked into the church interior, which had passed the gate cleanly, and it was badly wrong. The model had read a small indoor room as an outdoor plaza. The walls had become floor. The statue and altar were gone. And the gate did not care, because edges staying put is exactly what a content inversion with intact layout looks like.
 
 Four more turned up the same way. A route canvas where the vertical cliff face became a top-down forest floor, so the walkable path ran across what now read as treetops, the waterfall collapsed into a puddle, and a ladder had been invented against a doorway that had none. Another where the model painted a river along the walkable dirt path, narrowing it and replacing half of it with water the player walks straight through. That one scored a median edge distance of 1.0 pixels and zero global shift. A perfect alignment report, for a canvas with a river through the middle of the road.
 
-<figure class="wide"><div class="triptych"><img src="media/gate-426-source.png" alt="source" loading="lazy"><img src="media/gate-426-broken.png" alt="broken generation" loading="lazy"><img src="media/gate-426-fixed.png" alt="corrected generation" loading="lazy"></div><figcaption>Left: the source render. Middle: a generation that passed the alignment gate. The vertical cliff has become a top-down forest floor, the waterfall has collapsed into a puddle, and a ladder has been invented against the doorway. Right: the same canvas after the prompt and the gate were fixed.</figcaption></figure>*Left: the source render. Middle: a generation that passed the alignment gate. The vertical cliff has become a top-down forest floor, the waterfall has collapsed into a puddle, and a ladder has been invented against the doorway. Right: the same canvas after the prompt and the gate were fixed.*
+<figure class="wide"><div class="triptych"><img src="media/gate-426-source.png" alt="source" loading="lazy"><img src="media/gate-426-broken.png" alt="broken generation" loading="lazy"><img src="media/gate-426-fixed.png" alt="corrected generation" loading="lazy"></div><figcaption>Left: the source render. Middle: a generation that passed the alignment gate. The vertical cliff has become a top-down forest floor, the waterfall has collapsed into a puddle, and a ladder has been invented against the doorway. Right: the same canvas after the prompt and the gate were fixed.</figcaption></figure>
 
 So: five semantically broken canvases, zero caught by the automated gate. All five were caught by a human looking at pictures, two by me noticing something looked off while playing, the rest in a manual pass over the batch.
 
@@ -255,9 +255,9 @@ Character sprites presented the same problem in a different shape. All of a char
 <figure class="wide">
 <img src="media/nigel-sheet-hd.png" alt="One character, every frame, one generation. Sending them as a single sheet is what keeps the character the same person across poses." loading="lazy">
 <figcaption>One character, every frame, one generation. Sending them as a single sheet is what keeps the character the same person across poses.</figcaption>
-</figure>*One character, every frame, one generation. Sending them as a single sheet is what keeps the character the same person across poses.*
+</figure>
 
-<figure class="wide"><div class="triptych"><img src="media/nigel-walk-hd.gif" alt="Nigel walk cycle" loading="lazy"><img src="media/dog-walk-hd.gif" alt="dog walk cycle" loading="lazy"><img src="media/chicken-walk-hd.gif" alt="chicken walk cycle" loading="lazy"></div><figcaption>Sliced back into animations. The boil is easier to see than to describe.</figcaption></figure>*Sliced back into animations. The boil is easier to see than to describe.*
+<figure class="wide"><div class="triptych"><img src="media/nigel-walk-hd.gif" alt="Nigel walk cycle" loading="lazy"><img src="media/dog-walk-hd.gif" alt="dog walk cycle" loading="lazy"><img src="media/chicken-walk-hd.gif" alt="chicken walk cycle" loading="lazy"></div><figcaption>Sliced back into animations. The boil is easier to see than to describe.</figcaption></figure>
 
 My honest conclusion after three generations of art packs: the gate will never be sound, because the question is semantic and the measurement is not. The eyeball pass is the real gate, and the right engineering move is to make the eyeball pass cheap: one contact sheet, source beside generation, all forty-eight canvases in the current pack, one scroll. I should have built that first, instead of the two gates. I built the metrics because building metrics was more fun, and I am writing that down so that at least next time I will know I knew.
 
@@ -294,7 +294,7 @@ That last one, typed in passing, is the church from the previous section, and it
 <figure class="wide">
 <img src="media/sprites-upside-down.png" alt="sprites rendered upside down" loading="lazy">
 <figcaption>The first of those reports. Billboards were rendering vertically flipped, character and torch flame both. The inset bottom right is the emulator's own output, which is what it should have looked like. The camera is y-down, so the sprite texture needed its vertical flip disabled.</figcaption>
-</figure>*The first of those reports. Billboards were rendering vertically flipped, character and torch flame both. The inset bottom right is the emulator's own output, which is what it should have looked like. The camera is y-down, so the sprite texture needed its vertical flip disabled.*
+</figure>
 
 The mobile controls are the sharpest single illustration of the pattern. A subagent built a touch layer and verified it exhaustively, with real Chrome touch events dispatched through the debugging protocol, proving that tap and drag and flick and pinch all produced the right pad output, 850 tests green, screenshots attached. Every gesture worked. I put it on my phone, played for twenty minutes, and reported: "right now I don't even know how to swing the sword". It had shipped a gesture-only scheme with no visible buttons. The verification was complete and correct and the thing was unusable, because nothing it could check would have told it that.
 
@@ -303,7 +303,7 @@ The irritating part is that the right shape had already been specified. The same
 <figure class="wide">
 <img src="media/phone-touch-layer.png" alt="The replacement: a floating stick under the left thumb and actual visible buttons under the right." loading="lazy">
 <figcaption>The replacement: a floating stick under the left thumb and actual visible buttons under the right.</figcaption>
-</figure>*The replacement: a floating stick under the left thumb and actual visible buttons under the right.*
+</figure>
 
 Here is the comparison I promised at the top. The two halves of this project were built in the same week, with the same tools and the same coding agent. The emulator, extractor and renderer half had cheap sound oracles at every step: a reference implementation to diff against, a byte-exact assertion, a pixel percentage, 856 tests in under five seconds. That half converged in days, ran largely unsupervised through background agents, and I honestly could not tell you what most of the commits contain. The art half has no oracle, because "is this canvas semantically faithful" is not a question you can assert on. That half needed me for every judgment, produced five semantic failures that no automated check caught, and after three generations of art packs is still not settled. Same agent, same week, same person. The only variable was whether the feedback loop could run without me.
 
