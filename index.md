@@ -8,7 +8,7 @@ layout: default
 
 ## What this is
 
-Landstalker came out on the Mega Drive in 1992. It's an isometric action RPG, Zelda-ish, and famous among the people who played it for having the worst jumping in the genre. The camera is a fixed three-quarter projection with no shadows and no parallax, so when you're mid-jump over a pit you've no idea where you're or where you'll land. I played it as a kid, I replayed it on emulators over the years, and I never stopped resenting that one thing.
+Landstalker came out on the Mega Drive in 1992. It's an isometric action RPG, Zelda-ish, and famous among the people who played it for having the worst jumping in the genre. The camera is a fixed three-quarter projection with no shadows and no parallax, so when you're mid-jump over a pit you have no idea where you are or where you'll land. I played it as a kid, I replayed it on emulators over the years, and I never stopped resenting that one thing.
 
 Over four days at the start of August I built a remaster of it.
 
@@ -26,13 +26,13 @@ For as long as I'd thought about it at all, I assumed fixing the jumping meant f
 
 Then I noticed I'd been solving the wrong problem. I don't want better physics. I want to see where I'm going to land. Those aren't the same requirement, and only one of them is cheap.
 
-The cheap one is to leave the game exactly as it's and change only what you see. Which had already been ruled out earlier that same evening, on the perfectly sound grounds that if the emulator is the physics then it can never fix the jumping. It stopped being a problem the moment I stopped trying to fix the jumping.
+The cheap one is to leave the game exactly as it is and change only what you see. Which had already been ruled out earlier that same evening, on the perfectly sound grounds that if the emulator is the physics then it can never fix the jumping. It stopped being a problem the moment I stopped trying to fix the jumping.
 
-Nothing in it's reimplemented. The original ROM runs unmodified in Genesis Plus GX at 60Hz, and combat, dialogue, physics, item handling, puzzle state and room transitions still happen in the 68000 code. What I replaced is the presentation layer: a bridge reads the emulator's work RAM every frame and streams the game state over a websocket, and a three.js renderer draws that state as real geometry, using tile and sprite art extracted from the ROM. The emulator's own video output gets thrown away. It's in there as a physics and logic server. Audio passes straight through, because there was no reason to touch it.
+Nothing in it is reimplemented. The original ROM runs unmodified in Genesis Plus GX at 60Hz, and combat, dialogue, physics, item handling, puzzle state and room transitions still happen in the 68000 code. What I replaced is the presentation layer: a bridge reads the emulator's work RAM every frame and streams the game state over a websocket, and a three.js renderer draws that state as real geometry, using tile and sprite art extracted from the ROM. The emulator's own video output gets thrown away. It's in there as a physics and logic server. Audio passes straight through, because there was no reason to touch it.
 
 There's one rule that kept the whole thing tractable: never write to emulator RAM. Input goes in through the pad, the same three buttons and d-pad the hardware has, and state only comes out. I was strict about this for two reasons:
 
-1. The moment you poke memory, you've forked the game. Its bugs are now your bugs, and every "just this once" after that's more unbounded work.
+1. The moment you poke memory, you've forked the game. Its bugs are now your bugs, and every "just this once" after that is more unbounded work.
 2. The read-only constraint is checkable. There's a test, `test_ram_is_never_written`, that snapshots the entity table, calls the state reader twice, and asserts nothing moved. It's a slightly silly test and I'd write it again, because this rule is the only thing standing between the project and a slow reimplementation of Landstalker.
 
 So even the click-to-move pathfinding plays by pad: it plans a route over the extracted collision grid and then presses direction buttons cell by cell, like a very patient person with a controller.
@@ -42,6 +42,8 @@ Once the world is actual geometry instead of a painted picture, a lot of things 
 About the ROM: "ship code, never content" is the line in the project spec. The ROM isn't in the repo and isn't distributed, it's a read-only input supplied by whoever runs this, pinned by SHA-1, with a hard fail on any mismatch.
 
 One more thing before the technical part, so nobody has to wonder: this was built with coding agents. I typed 62 messages total across the four days. There's a section about that at the end, with numbers, including the parts where it went badly. I put it at the end because the interesting observation comes from comparing the two halves of this project (the reverse engineering against the AI art), and that comparison needs the rest of the article first.
+
+That does raise a question about the word "I" in everything that follows. I'm using it the way you'd say you built a house without having laid a brick. I decided things, I looked at things, I said what was wrong. Most of the typing wasn't mine, and a fair amount of what comes next I reconstructed afterwards, from the transcripts, the commit log and the handover notes the agents wrote for each other, because at the time I was largely watching it go past. Where the difference matters to the story, I'll say so.
 
 ## The emulator as a physics server
 
@@ -68,9 +70,9 @@ Audio was almost free, and this surprised me. The core had been generating the f
 
 Two parts of the bridge cost me real time, and neither presented as an error.
 
-The first is that Genesis Plus GX stores 68000 work RAM byte-swapped within 16-bit words on little-endian hosts. Every read has to be `[addr ^ 1]`. Fine, once you know it. But VDP registers are *not* swapped. And colour RAM is swapped *and also* packed differently from what the hardware documentation describes: 9-bit `BBBGGGRRR` rather than VDP colour words. None of this is written down anywhere obvious. The way it presents is that your numbers are nonsense: an entity X coordinate that jumps by 256 when the player takes one step, colours that are almost but not quite right. You stare at plausible-looking garbage and you've no idea which layer is lying to you.
+The first is that Genesis Plus GX stores 68000 work RAM byte-swapped within 16-bit words on little-endian hosts. Every read has to be `[addr ^ 1]`. Fine, once you know it. But VDP registers are *not* swapped. And colour RAM is swapped *and also* packed differently from what the hardware documentation describes: 9-bit `BBBGGGRRR` rather than VDP colour words. None of this is written down anywhere obvious. The way it presents is that your numbers are nonsense: an entity X coordinate that jumps by 256 when the player takes one step, colours that are almost but not quite right. You stare at plausible-looking garbage and you have no idea which layer is lying to you.
 
-The second was a hang. Mid-afternoon on the fourth day the bridge stopped sending states, while still accepting new connections and answering the handshake, which is the worst kind of failure because every quick check tells you the server is fine. The cause turned out to be a websocket send with no timeout. Vite's dev-server proxy holds a connection open after its page navigates away, that socket never drains, its buffer fills, and one `await ws.send()` blocks the entire 60Hz loop forever. The fix is one line and the comment above it's longer than the code:
+The second was a hang. Mid-afternoon on the fourth day the bridge stopped sending states, while still accepting new connections and answering the handshake, which is the worst kind of failure because every quick check tells you the server is fine. The cause turned out to be a websocket send with no timeout. Vite's dev-server proxy holds a connection open after its page navigates away, that socket never drains, its buffer fills, and one `await ws.send()` blocks the entire 60Hz loop forever. The fix is one line and the comment above it is longer than the code:
 
 ```
 # A half-open socket (e.g. the vite proxy after its page navigated
@@ -114,14 +116,14 @@ Altogether 856 tests, running in 4.7 seconds. The suite also boots the actual em
 
 On top of the tests there's a pixel harness. It compares the emulator's own framebuffer against a pure-Python render of the same room from extracted assets, and reports a percentage. Getting that number to mean anything took more care than the comparison itself: it waits for the palette fade to finish and the camera words to stop moving before capturing, it renders colours through the emulator's exact RGB565 expansion rather than a naive ramp, and it masks out sprite pixels by walking the VDP sprite attribute table's link list, since entities aren't part of a static room render. The number came out at 98.1% average background match across the reachable rooms, worst room 97.0%. The residual is animated tile phase, plus a couple of places where the game edits its own tilemap at runtime. There's a rope bridge in the prologue that physically collapses, so the live tilemap legitimately differs from the cartridge there.
 
-The best bug the harness caught was in the harness itself, and I want to tell this one properly. The match percentage sat stubbornly low, several points below where it should have been, and it wouldn't move. I went back through the decoders. They were fine. I went through the palette expansion. Fine. Eventually I looked at *where* the mismatching pixels actually were, and they were all at the top and bottom of the frame. The game only draws the scrolling map in screen rows 21 through 184. Above that's the HUD, below it's blank. The comparison had been counting both regions as extraction errors. The extracted geometry had been correct the whole time, and I'd spent the debugging session auditing innocent code. I find this a strong argument for building harnesses even when they're miscalibrated: a wrong number is something you can investigate. No number, and I'd simply never have looked.
+The best bug the harness caught was in the harness itself, and this one is worth telling properly. The match percentage sat stubbornly low, several points below where it should have been, and it wouldn't move. So the decoders got audited. They were fine. Then the palette expansion. Also fine. What finally cracked it was looking at *where* the mismatching pixels actually were, which was all at the top and bottom of the frame. The game only draws the scrolling map in screen rows 21 through 184. Above that is the HUD, below it is blank, and the comparison had been counting both regions as extraction errors. The extracted geometry had been correct the whole time, and an entire debugging session had gone into auditing innocent code. I find this a strong argument for building harnesses even when they're miscalibrated: a wrong number is something you can investigate. No number, and I'd simply never have looked.
 
 <figure>
 <img src="media/extraction-vs-emulator.png" alt="The pixel harness. Top is the emulator's own framebuffer, bottom is the room rendered from extracted assets. The magenta band is the region under test." loading="lazy">
 <figcaption>The pixel harness. Top is the emulator's own framebuffer, bottom is the room rendered from extracted assets. The magenta band is the region under test.</figcaption>
 </figure>
 
-The animated tileset table shows where this approach runs out. It has a length field, and I read it as bytes. It's VDP words, so every animation frame was half the size it should be. No oracle covered that table, so nothing failed, and the bug sat there until reading the game's own DMA routine and watching live VRAM exposed it. Wherever ground truth runs out, this is what the work goes back to looking like.
+The animated tileset table shows where this approach runs out. It has a length field, and it got read as bytes. It's VDP words, so every animation frame was half the size it should be. No oracle covered that table, so nothing failed, and the bug sat there until reading the game's own DMA routine and watching live VRAM exposed it. Wherever ground truth runs out, this is what the work goes back to looking like.
 
 ## Drawing it
 
@@ -158,7 +160,7 @@ That's the bug report, in full, from me on a couch on day one. It's also the onl
 
 Sprites are billboards, flat quads standing in the world. The first version put each quad at its entity's depth, and walls behind the character clipped his head off, because a wall face one cell further back has greater depth than the character's feet. Obvious enough in hindsight.
 
-Second attempt: lean the top edge of each quad toward the camera by the sprite's own height. This fixed the general case. Then characters pressed flush against a wall still lost a few pixels, so the quad got a half-cell depth bias, on the reasoning that a sprite represents the front half of a person. Better. Still wrong near the huts in the first village, and still wrong mid-jump. At this point I was tuning constants and each fix was making a different room worse, which is usually the sign that the premise is broken.
+Second attempt: lean the top edge of each quad toward the camera by the sprite's own height. This fixed the general case. Then characters pressed flush against a wall still lost a few pixels, so the quad got a half-cell depth bias, on the reasoning that a sprite represents the front half of a person. Better. Still wrong near the huts in the first village, and still wrong mid-jump. By this point it was constant-tuning, and each fix made a different room worse, which is usually the sign that the premise is broken.
 
 The premise was broken. The VDP doesn't depth-test sprites against background graphics. There is no depth buffer on a Mega Drive at all. Sprites and planes are separate layers composited by fixed rules, and the only mechanism by which background art can cover a sprite is a single priority bit. Landstalker computes that bit itself, every frame, per entity: a routine checks whether terrain in front of the entity is taller than it is, and if so clears the bit so the entity draws behind the foreground art. It caches the result in a per-entity structure, and the bridge reads it out and ships it as a boolean. (The bit reads 0 in the trench room's ditches and 1 on open floor, which is how I confirmed I was reading the right byte.)
 
@@ -177,7 +179,7 @@ Every visual change in this project has to keep an exact-mode render pixel-ident
 
 Torch lights were the first thing that felt like cheating. Hand-placing lights across 816 rooms was obviously not happening, and it turned out I didn't have to: flames in this game are animated tiles, and a warm-coloured animated tile is in practice always fire, since the other animated tiles are cool-coloured. So the renderer scans a room's block layers, picks out animated tiles whose average colour is strongly red-dominant, clusters adjacent cells, and emits one point light per cluster. Nothing hand-authored, and it covers every room in the game.
 
-My favourite three lines in the codebase handle flames painted on walls. A flame like that's at the wall's position, but a light source there sits inside the geometry. Because the view axis is (1, 1, 1), every point along that axis projects to the same screen pixel, so the light just slides along the view axis until it finds passable floor, and ends up hovering in front of the wall while its projection stays exactly on the painted flame.
+My favourite three lines in the codebase handle flames painted on walls. A flame like that is at the wall's position, but a light source there sits inside the geometry. Because the view axis is (1, 1, 1), every point along that axis projects to the same screen pixel, so the light just slides along the view axis until it finds passable floor, and ends up hovering in front of the wall while its projection stays exactly on the painted flame.
 
 <figure>
 <img src="media/torches-early.png" alt="First attempt at torch lights." loading="lazy">
@@ -209,7 +211,7 @@ Every one of these features defaults to off, and with the neutral settings the s
 
 The generated art had no oracle, and couldn't have one, and this section is about what that turned out to mean in practice.
 
-One admission first. The ideation conversation never discussed generating art at all. The only trace of it's a passing exchange about giving NPCs more variety, where the answer pointed out that outside the ROM there are no VRAM or palette limits, and that the hard part would be stylistic consistency: new art has to match the original's conventions or it reads as foreign against the extracted world. That's the whole second half of this project, described in one sentence, on day zero, by someone who hadn't seen any of it. I filed it under later.
+One admission first. The ideation conversation never discussed generating art at all. The only trace of it is a passing exchange about giving NPCs more variety, where the answer pointed out that outside the ROM there are no VRAM or palette limits, and that the hard part would be stylistic consistency: new art has to match the original's conventions or it reads as foreign against the extracted world. That's the whole second half of this project, described in one sentence, on day zero, by someone who hadn't seen any of it. I filed it under later.
 
 The pipeline rasterises a room canvas from the extracted assets, pads it with black to the nearest aspect ratio the image API supports, and sends it image-to-image to Gemini at 4K with a prompt insisting the layout is authoritative. It resizes the result back to exactly 4x, crops the padding, and forces the void area black again. Room variants share art, so deduplicating by rendered identity turns 816 rooms into 647 unique canvases. The renderer then swaps the palette-index albedo for the generated image and keeps every other feature: lighting, shadows, ambient occlusion, the priority overlay, and the colour-RAM fade tracking, so HD rooms still fade correctly through doors.
 
@@ -258,7 +260,7 @@ It still can't see. Room 181 scored an anomaly fraction of 0.0, no coherent comp
 
 The prompt is an archaeological record of the same process. It started at six clauses and grew one per disaster. Merging trees produced a clause about keeping their exact count and species. The church produced another that spells out which part of an isometric interior is wall and which is floor. Water must stay saturated blue. Clause eight reads in part "A flat wall decoration in the source stays a flat wall decoration; never reinterpret one as a ladder or any other three-dimensional object", after a test generation turned a wall banner into a ladder.
 
-Character sprites presented the same problem in a different shape. All of a character's frames go into one grid and get regenerated in a single call, because that's what holds identity constant across poses. Alpha authority never leaves the original: the source silhouette, dilated two pixels, caps what can be opaque, so a generated sprite physically can't leak outside an honest outline. I measured identity drift between adjacent walk frames and got a worst-case channel shift of 6 out of 255, which is excellent, and I was briefly pleased with myself. Then I watched them in motion. They shimmer. Hair tufts change shape, the scabbard drifts a few degrees, the dog's harness wobbles, and at 60Hz it reads as a faint boil. The metric measured colour consistency, which held up, and said nothing about shape consistency, which failed.
+Character sprites presented the same problem in a different shape. All of a character's frames go into one grid and get regenerated in a single call, because that's what holds identity constant across poses. Alpha authority never leaves the original: the source silhouette, dilated two pixels, caps what can be opaque, so a generated sprite physically can't leak outside an honest outline. Identity drift between adjacent walk frames came out at a worst-case channel shift of 6 out of 255, which is excellent, and I was briefly pleased with myself. Then I watched them in motion. They shimmer. Hair tufts change shape, the scabbard drifts a few degrees, the dog's harness wobbles, and at 60Hz it reads as a faint boil. The metric measured colour consistency, which held up, and said nothing about shape consistency, which failed.
 
 <figure class="wide">
 <img src="media/nigel-sheet-hd.png" alt="One character, every frame, one generation. Sending them as a single sheet is what keeps the character the same person across poses." loading="lazy">
@@ -331,7 +333,7 @@ The other is the half of this article you've just read. The part that would supp
 
 So, hedged exactly as far as I believe it: more of these are coming, and they will be made one person at a time, for one game that person loved, over a handful of evenings. Not by anybody doing twenty.
 
-There's a group for whom this is economics rather than affection, and it's not us. None of it's distributable. Sega could ship this tomorrow, I can only build it for myself. Which, going back through the ideation conversation, is the only thing I ever asked for:
+There's a group for whom this is economics rather than affection, and it's not us. None of it is distributable. Sega could ship this tomorrow, I can only build it for myself. Which, going back through the ideation conversation, is the only thing I ever asked for:
 
 > I just want this for myself
 
