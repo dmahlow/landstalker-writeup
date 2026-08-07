@@ -337,8 +337,6 @@ There's a group for whom this is economics rather than affection, and it's not u
 
 > I just want this for myself
 
-The last thing I typed at this project, at six in the morning after too many parallel sessions, was "small change, make her house a rainbow themed house". Ten minutes later: "damn, wrong session, pls revert". By then the agent had already regenerated the house.
-
 ---
 
 The code isn't public yet. When it is, it goes up without the ROM and without the extracted assets, which is the only way it can go up.
