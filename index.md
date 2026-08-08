@@ -8,14 +8,14 @@ layout: default
 
 ## What this is
 
-My dad rented Landstalker from the video shop when I was seven. We played it in the evenings, the two of us, and I fell in love with it. Eventually we bought it, and when he handed the Mega Drive down it came with the cartridge.
+My dad rented Landstalker from the video shop when I was eight. We played it in the evenings, the two of us, and I fell in love with it. Eventually we bought it, and when he handed the Mega Drive down it came with the cartridge.
 
 <figure class="wide">
 <img src="media/orig-title.png" alt="Japan got it in 1992, the rest of us in 1993." loading="lazy">
 <figcaption>Japan got it in 1992, the rest of us in 1993.</figcaption>
 </figure>
 
-An isometric adventure, a treasure hunt for King Nole's gold, dungeons built almost entirely out of jumping puzzles, and a fairy called Friday who does not stop talking. I played it in German. It took me until I was about twelve to finish it, and I did finish it, which felt like an achievement at the time and on reflection still does. There was an underground dungeon beneath one of the larger cities, several riddles to a room, that held me up for weeks.
+An isometric adventure, a treasure hunt for King Nole's gold, dungeons built almost entirely out of jumping puzzles, and a fairy called Friday who does not stop talking. I played it in German. It took me until I was about twelve to finish it, and I did finish it, which felt like an achievement at the time and on reflection still does. There was an underground dungeon beneath Mercator, several riddles to a room, that held me up for weeks.
 
 <figure class="wide">
 <img src="media/orig-prologue.png" alt="Nigel on a ledge above the pines. Also, and this will matter later, possibly standing in the pines. There is no way to tell." loading="lazy">
