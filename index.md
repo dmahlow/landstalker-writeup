@@ -8,14 +8,14 @@ layout: default
 
 ## What this is
 
-The other kids had a Super Nintendo, which meant they had Zelda. I had a Mega Drive, which meant I had Sonic and a set of carefully rehearsed opinions about why that was better. It wasn't better. What I wanted was the game where you wander around a world, talk to people and open things, and Nintendo owned that one.
+My dad rented Landstalker from the video shop when I was seven. We played it in the evenings, the two of us, and I fell in love with it. Eventually we bought it, and when he handed the Mega Drive down it came with the cartridge.
 
 <figure class="wide">
 <img src="media/orig-title.png" alt="Japan got it in 1992, the rest of us in 1993." loading="lazy">
 <figcaption>Japan got it in 1992, the rest of us in 1993.</figcaption>
 </figure>
 
-Then Landstalker turned up. Isometric, a real adventure, a treasure hunt for King Nole's gold, dungeons built almost entirely out of jumping puzzles, and a fairy called Friday who does not stop talking. A Zelda-shaped hole filled in by the machine that supposedly couldn't do Zelda. I was nine.
+An isometric adventure, a treasure hunt for King Nole's gold, dungeons built almost entirely out of jumping puzzles, and a fairy called Friday who does not stop talking. I played it in German. It took me until I was about twelve to finish it, and I did finish it, which felt like an achievement at the time and on reflection still does. There was an underground dungeon beneath one of the larger cities, several riddles to a room, that held me up for weeks.
 
 <figure class="wide">
 <img src="media/orig-prologue.png" alt="Nigel on a ledge above the pines. Also, and this will matter later, possibly standing in the pines. There is no way to tell." loading="lazy">
@@ -27,9 +27,7 @@ Then Landstalker turned up. Isometric, a real adventure, a treasure hunt for Kin
 <figcaption>Friday, who says this a lot.</figcaption>
 </figure>
 
-<!-- MEMORY: specific childhood detail goes here -->
-
-**[one specific memory goes here]**
+People file this game under "the Mega Drive's Zelda", which is backwards from where I sit. Landstalker came first. So when I did eventually play a Zelda, that flat half-top-down camera looked wrong to me, like it had been mounted in the wrong place. The isometric one had got there first and spoiled me for the other thing.
 
 It also had the worst jumping in the genre. The camera is a fixed three-quarter projection with no shadows and no parallax, so when you're mid-jump over a pit you have no idea where you are or where you'll land. I replayed it on emulators over the years and never stopped resenting that one thing.
 
