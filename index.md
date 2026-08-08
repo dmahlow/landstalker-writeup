@@ -8,7 +8,35 @@ layout: default
 
 ## What this is
 
-Landstalker came out on the Mega Drive in 1992. It's an isometric action RPG, Zelda-ish, and famous among the people who played it for having the worst jumping in the genre. The camera is a fixed three-quarter projection with no shadows and no parallax, so when you're mid-jump over a pit you have no idea where you are or where you'll land. I played it as a kid, I replayed it on emulators over the years, and I never stopped resenting that one thing.
+The other kids had a Super Nintendo, which meant they had Zelda. I had a Mega Drive, which meant I had Sonic and a set of carefully rehearsed opinions about why that was better. It wasn't better. What I wanted was the game where you wander around a world, talk to people and open things, and Nintendo owned that one.
+
+<figure class="wide">
+<img src="media/orig-title.png" alt="Japan got it in 1992, the rest of us in 1993." loading="lazy">
+<figcaption>Japan got it in 1992, the rest of us in 1993.</figcaption>
+</figure>
+
+Then Landstalker turned up. Isometric, a real adventure, a treasure hunt for King Nole's gold, dungeons built almost entirely out of jumping puzzles, and a fairy called Friday who does not stop talking. A Zelda-shaped hole filled in by the machine that supposedly couldn't do Zelda. I was nine.
+
+<figure class="wide">
+<img src="media/orig-prologue.png" alt="Nigel on a ledge above the pines. Also, and this will matter later, possibly standing in the pines. There is no way to tell." loading="lazy">
+<figcaption>Nigel on a ledge above the pines. Also, and this will matter later, possibly standing in the pines. There is no way to tell.</figcaption>
+</figure>
+
+<figure class="wide">
+<img src="media/orig-friday.png" alt="Friday, who says this a lot." loading="lazy">
+<figcaption>Friday, who says this a lot.</figcaption>
+</figure>
+
+<!-- MEMORY: specific childhood detail goes here -->
+
+**[one specific memory goes here]**
+
+It also had the worst jumping in the genre. The camera is a fixed three-quarter projection with no shadows and no parallax, so when you're mid-jump over a pit you have no idea where you are or where you'll land. I replayed it on emulators over the years and never stopped resenting that one thing.
+
+<figure class="wide">
+<img src="media/orig-trench.png" alt="Four ledges at four different heights, no shadow anywhere, and a drop between them. Now jump." loading="lazy">
+<figcaption>Four ledges at four different heights, no shadow anywhere, and a drop between them. Now jump.</figcaption>
+</figure>
 
 Over four days at the start of August I built a remaster of it.
 
